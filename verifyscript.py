@@ -584,7 +584,7 @@ def main():
     pymupdf.TOOLS.set_icc(False)
     InitializeFiles()
     UnzipFiles()
-    # OpenTrackers()
+    OpenTrackers()
     ValidateMatches()
     VerifyPdfs()
     PrintStatistics()
