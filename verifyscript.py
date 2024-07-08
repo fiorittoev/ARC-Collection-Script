@@ -172,8 +172,7 @@ def OpenTrackers():
         next(zip_reader)  # Skip header
 
         # Use panda to get a length for csv
-        df = pd.read_csv(tracker_directory + "/ziptracker.csv")
-        num_lines = len(df)
+        num_lines = len(pd.read_csv(tracker_directory + "/ziptracker.csv"))
 
         with alive_bar(num_lines) as bar:  # Progress bar
             bar.text("Pulling Metadata")
@@ -257,86 +256,78 @@ def MetadataAppend(filename, key, name_HH, name_mergent, year, date, doctype, pa
 
 
 def ValidateMatches():
+    """
+    Iterate through ARC_HH_OK_AR_missing.csv and account for statuses of desired files
+
+    Return: void
+    """
 
     na_statuses = ["NA", "TL", "SK"]
-    used_files = []
-    all_files = []
+    downloaded_files = []
 
-    with open("ARC_HH_OK_AR_missing.csv", "r", newline="") as arc_file:
+    # Use panda to get a length for csv
+    num_lines = len(
+        pd.read_csv("ARC_HH_OK_AR_missing.csv", low_memory=False)
+    )  # Low_memory=false removes warnings
 
-        arc_reader = csv.reader(arc_file)
-        next(arc_reader)
+    # Need all files in a list to get dates for files
+    with open(tracker_directory + "/filestracker.csv", "r", newline="") as files_file:
+        files_reader = csv.reader(files_file)
+        next(files_reader)
 
-        for arc_row in arc_reader:
+        for files_row in files_reader:
+            downloaded_files.append(files_row)
 
-            key = arc_row[1]
-            name = arc_row[16]
-            year = arc_row[9]
-            data_date = (arc_row[8].split(" "))[0]
-            status = "NA"
-            year_match = "N"
-            file_count = 0
+    with alive_bar(num_lines) as bar:  # Progress bar
+        bar.text("Validating ARC_missing.csv matches with files")
 
-            with open(
-                tracker_directory + "/ziptracker.csv", "r", newline=""
-            ) as zips_file:
-                zips_reader = csv.reader(zips_file)
-                next(zips_reader)  # Skip header
+        with open("ARC_HH_OK_AR_missing.csv", "r", newline="") as arc_file:
 
-                for zips_row in zips_reader:
+            arc_reader = csv.reader(arc_file)
+            next(arc_reader)  # Skip headers
 
-                    if zips_row[0] == key:
+            for arc_row in arc_reader:
+                key = arc_row[1]
+                name = arc_row[16]
+                year = arc_row[9]
+                data_date = (arc_row[8].split(" "))[0]
+                status = "NA"
+                year_match = "N"
+                file_count = 0
 
-                        if zips_row[2] not in na_statuses:
+                with open(
+                    tracker_directory + "/ziptracker.csv", "r", newline=""
+                ) as zips_file:
+                    zips_reader = csv.reader(zips_file)
+                    next(zips_reader)  # Skip headers
 
-                            with open(
-                                tracker_directory + "/filestracker.csv", "r", newline=""
-                            ) as files_file:
+                    for zips_row in zips_reader:
 
-                                if len(all_files) == 0:
-                                    flag = 1
+                        if zips_row[0] == key:  # GVkeys match
 
-                                files_reader = csv.reader(files_file)
-                                next(files_reader)
-                                appended = False
+                            if zips_row[2] not in na_statuses:
+                                status = "OK"
 
-                                for files_row in files_reader:
+                            if status != "OK":
+                                if zips_row[2] in na_statuses:
+                                    status = zips_row[2]
+                                else:
+                                    status = "NA"
 
-                                    if flag:
-                                        all_files.append(
-                                            files_row
-                                        )  # store all files on first iteration
+                # If an entry has a file match, we will check the year
+                if status == "OK":
 
-                                    if (
-                                        files_row[0] == zips_row[0]
-                                        and files_row[3] == zips_row[2]
-                                        and files_row not in used_files
-                                    ):
-                                        status = "OK"
+                    for item in downloaded_files:
+                        if (
+                            item[4].split("/")[-1] == year and item[0] == key
+                        ):  # Account for match if GVkey and exact year match
+                            year_match = "Y"
+                            file_count += 1
+                bar()
 
-                                        if appended == False:
-                                            used_files.append(files_row)
-                                            appended = True
-
-                                flag = 0
-
-                        if status != "OK":
-
-                            if zips_row[2] in na_statuses:
-                                status = zips_row[2]
-
-                            else:
-                                status = "NA"
-
-            if status == "OK":
-
-                for item in all_files:
-
-                    if item[4].split("/")[-1] == year and item[0] == key:
-                        year_match = "Y"
-                        file_count += 1
-
-            MatchingAppend(key, name, year, data_date, status, year_match, file_count)
+                MatchingAppend(
+                    key, name, year, data_date, status, year_match, file_count
+                )
 
 
 def MatchingAppend(key, name, year, data_date, status, year_match, file_count):
@@ -413,7 +404,7 @@ def TypesAppend(
         writer = csv.writer(file)
         try:
             writer.writerow(temp)
-        except UnicodeEncodeError:  # Thrown unexcpectedly, cause not known
+        except UnicodeEncodeError:  # Thrown unexpectedly, cause not known
             return 0
 
 
@@ -606,11 +597,9 @@ def VerifyPdfs():
 
 def PrintStatistics():
     """
-    Prints various stats about the result
+    Prints various stats about the results of VerifyPdfs()
 
-    Keyword arguments:
-    argument -- description
-    Return: return_description
+    Return: void
     """
 
     scan_count = 0
