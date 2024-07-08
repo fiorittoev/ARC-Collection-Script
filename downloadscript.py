@@ -562,9 +562,14 @@ def WriteZipTracker(key, val, page):
     # If row exists we will not write it, and break out
     with open("./trackers/ziptracker.csv", "r", newline="") as file:
         reader = csv.reader(file)
-        for row in reader:
-            if row == temp:
-                return 0
+        if page != "SK":
+            for row in reader:
+                if row == temp:
+                    return 0
+        else:  # If a file is already NA, a revisit should not be appended as SK
+            for row in reader:
+                if [temp[0], temp[1], "NA"] == row:
+                    return 0
 
     with open("./trackers/ziptracker.csv", "a", newline="") as file:
         writer = csv.writer(file)
