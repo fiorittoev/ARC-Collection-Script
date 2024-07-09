@@ -135,8 +135,14 @@ def GetFileInfo(key, zip_page, row_number):
             "_"
         )  # Split path to list to allow indexing
 
+        # account for altreports
+        if folder_name_list[-1] == "altreport":
+            file_page = folder_name_list[-2]
+        else:
+            file_page = folder_name_list[-1]
+
         if (
-            key == folder_name_list[0] and zip_page == folder_name_list[-1]
+            key == folder_name_list[0] and zip_page == file_page
         ):  # Identifyin information for the folder is its gvkey and download page
 
             folder_path = os.path.join(folder_directory, folder_name)

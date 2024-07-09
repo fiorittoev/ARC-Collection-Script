@@ -128,7 +128,7 @@ def CompleteAuth(driver, user, pw):
     # CHECK FOR HANG AFTER SUBMITBUTTON
 
 
-def SearchActions(driver, val):
+def SearchActions(driver, bar, key, val, total_download, search_all):
     """
     All of the actions completed on the Search page, will land on results page
 
@@ -154,20 +154,27 @@ def SearchActions(driver, val):
 
     wait.until(EC.presence_of_element_located((By.ID, "ext-gen302")))
 
-    while doctype.get_attribute("value") != "ANR":
-        # Scroll to top
-        for x in range(0, 20):
-            documentQuery.send_keys(Keys.ARROW_UP)
-        # Select ANR
-        for x in range(0, 3):
-            documentQuery.send_keys(Keys.ARROW_DOWN)
-        documentQuery.send_keys(Keys.ENTER)
+    # Two cases, annual reports or unfiltered doctype
+    if search_all == False:
+
+        while doctype.get_attribute("value") != "ANR":
+            # Scroll to top
+            for x in range(0, 20):
+                documentQuery.send_keys(Keys.ARROW_UP)
+            # Select ANR
+            for x in range(0, 3):
+                documentQuery.send_keys(Keys.ARROW_DOWN)
+            documentQuery.send_keys(Keys.ENTER)
 
     submitButton = driver.find_element(By.ID, "ext-gen224")
     submitButton.click()
 
+    total_download = ResultActions(driver, bar, key, val, total_download, search_all)
 
-def ResultActions(driver, bar, key, val, total_download):
+    return total_download
+
+
+def ResultActions(driver, bar, key, val, total_download, search_all):
     """
     All of the actions completed on the Search Results page
 
@@ -184,6 +191,7 @@ def ResultActions(driver, bar, key, val, total_download):
     wait = WebDriverWait(driver, 20)
     # Checks for occasional hang after search
     load_success = 0
+
     try:
         pageCountContainer = wait.until(
             EC.presence_of_element_located(
@@ -199,6 +207,7 @@ def ResultActions(driver, bar, key, val, total_download):
         load_success = 1
     except TimeoutException:
         driver.refresh()
+
         try:
             pageCountContainer = wait.until(
                 EC.presence_of_element_located(
@@ -212,6 +221,7 @@ def ResultActions(driver, bar, key, val, total_download):
                 EC.presence_of_element_located((By.ID, "limitCount"))
             )
             load_sucess = 1
+
         except TimeoutException:
             load_sucess = 0
 
@@ -221,19 +231,38 @@ def ResultActions(driver, bar, key, val, total_download):
 
         # If there is only one page
         if last_page_number == "1":
-            scraperesults = ScrapeRows(driver, key, date_values, last_page_number)
+            scraperesults = ScrapeRows(
+                driver, key, date_values, last_page_number, search_all
+            )
 
             date_values = scraperesults[0]
             page_size = scraperesults[1]
-            filename = GenFileName(date_values, key, val, last_page_number)
+            filename = GenFileName(date_values, key, val, last_page_number, search_all)
+
             if (page_size + total_download) <= 1900000:
-                zipsize = BulkDownload(driver, filename)
+
                 if reportCountContainer.text == "0":
-                    WriteZipTracker(key, val, "NA")
+
+                    if (
+                        search_all
+                    ):  # If we are searching all doctypes and there are no results, we will write NA
+                        WriteZipTracker(key, val, "NA")
+                    else:
+                        # After either case, we go back to resume search
+                        driver.get(
+                            "https://www-mergentarchives-com.proxy1.cl.msu.edu/search.php"
+                        )
+                        SearchActions(
+                            driver, bar, key, val, total_download, True
+                        )  # Search again, no filter this time
+
                 else:
+                    zipsize = BulkDownload(driver, filename, search_all)
                     WriteZipTracker(key, val, last_page_number)
+
             else:
                 WriteZipTracker(key, val, "TL")  # TL for too large
+
             total_download += zipsize
 
         # multiple pages
@@ -244,17 +273,21 @@ def ResultActions(driver, bar, key, val, total_download):
 
                 zipsize = 0
 
-                scraperesults = ScrapeRows(driver, key, date_values, current_page)
+                scraperesults = ScrapeRows(
+                    driver, key, date_values, current_page, search_all
+                )
 
                 date_values = scraperesults[0]
                 page_size = scraperesults[1]
-                filename = GenFileName(date_values, key, val, str(current_page))
+                filename = GenFileName(
+                    date_values, key, val, str(current_page), search_all
+                )
 
                 if (
                     page_size + total_download
                 ) <= 1900000:  # if file greater than 180000 kb, mark and ship
 
-                    zipsize += BulkDownload(driver, filename)
+                    zipsize += BulkDownload(driver, filename, search_all)
                     total_download += zipsize
                     date_values.clear()  # need seperate ranges for each page's zip
 
@@ -317,7 +350,7 @@ def LoadTable(driver):
     return rows
 
 
-def ScrapeRows(driver, key, date_values, page_number):
+def ScrapeRows(driver, key, date_values, page_number, search_all):
     """
     Grabs date values from table of results
 
@@ -326,6 +359,7 @@ def ScrapeRows(driver, key, date_values, page_number):
     """
     rows = LoadTable(driver)
     invalids = ["", " "]
+    valid_docs = ["Annual/10K Report", "10K or Int'l Equivalent"]
     page_size_kb = 0
     # check each row for values
     count = 1
@@ -334,50 +368,62 @@ def ScrapeRows(driver, key, date_values, page_number):
         if (
             len(cells) > 5
         ):  # rows with empty cols used for spacing, anything greater than 3 holds real data
-            # DOUBLE CHECK COLS
-            outer_div1 = cells[3].find_element(
+
+            year_div = cells[3].find_element(
                 By.TAG_NAME, "div"
             )  # dates are nested within a div, cells[3] holds year information
-            outer_div2 = cells[4].find_element(
+            doc_div = cells[4].find_element(
                 By.TAG_NAME, "div"
             )  # cells[4] holds doc_type information
-            outer_div3 = cells[1].find_element(
+            name_div = cells[1].find_element(
                 By.TAG_NAME, "div"
             )  # cells[1] holds name information
-            outer_div4 = cells[5].find_element(
+            size_div = cells[5].find_element(
                 By.TAG_NAME, "div"
-            )  # dates are nested within a div, cells[3] holds year information
+            )  # dates are nested within a div, cells[5] has full date
 
-            value = (outer_div4.text)[:-2]
-            units = outer_div4.text[-2:]
-            if units not in invalids and value not in invalids:
-                value = float(value)
-                if units == "MB":
-                    value *= 1000
-                elif units == "GB":
-                    value *= 1000000
-                page_size_kb += value
+            if not search_all or doc_div.text in valid_docs:
 
-            year = (outer_div1.text)[-4:]  # year will be last four digits
+                # If were looking through multiple doctypes we need to select individual files
+                if search_all:
+                    try:
+                        (cells[0].find_element(By.TAG_NAME, "input")).click()
+                    except (
+                        ElementClickInterceptedException
+                    ):  # Will only occur at small resolutions, not in headlessly
+                        continue
 
-            if year not in invalids:  # Some empty values after last year
-                date_values.append(year)  # last 4 chars will always be the year
+                value = (size_div.text)[:-2]
+                units = size_div.text[-2:]
 
-                # If a valid year is found, the file is going to be downloaded, so we need to track
-                WriteFilesTracker(
-                    key,
-                    outer_div3.text,
-                    count,
-                    page_number,
-                    outer_div1.text,
-                    outer_div2.text,
-                )
+                if units not in invalids and value not in invalids:
+                    value = float(value)
+                    if units == "MB":
+                        value *= 1000
+                    elif units == "GB":
+                        value *= 1000000
+                    page_size_kb += value
+
+                year = (year_div.text)[-4:]  # year will be last four digits
+
+                if year not in invalids:  # Some empty values after last year
+                    date_values.append(year)  # last 4 chars will always be the year
+
+                    # If a valid year is found, the file is going to be downloaded, so we need to track
+                    WriteFilesTracker(
+                        key,
+                        name_div.text,
+                        count,
+                        page_number,
+                        year_div.text,
+                        doc_div.text,
+                    )
             count += 1
 
     return date_values, page_size_kb
 
 
-def GenFileName(date_values, key, val, page):
+def GenFileName(date_values, key, val, page, search_all):
     """
     Generates a file name, empty if date_values is empty
 
@@ -392,6 +438,10 @@ def GenFileName(date_values, key, val, page):
         filename = (
             key + "_" + val + "_" + start_date + "_" + end_date + "_" + page
         )  # adjust to format
+
+        if search_all:
+            filename += "_altreport"
+
         if ZipExistCheck("\\" + filename.replace(" ", "-")):
             filename = ""  # if it exists, we pass a blank filename so it wont trigger a download
 
@@ -409,7 +459,7 @@ def ZipExistCheck(filename):
     return os.path.isfile(GetDownloadDirectory() + filename + ".zip")
 
 
-def BulkDownload(driver, filename):
+def BulkDownload(driver, filename, search_all):
     """
     Starts a bulk download, halts selenium until download is complete and renamed
 
@@ -429,17 +479,15 @@ def BulkDownload(driver, filename):
         )
         wait = WebDriverWait(driver, 30)
 
-        # Wait for the overlay to disappear
-        # WebDriverWait(driver, 60).until(
-        #    EC.invisibility_of_element_located((By.ID, "ext-gen272"))
-        # )
-
         time.sleep(4)  # TEMP in case above 2 lines do not work
         checkAllButton = wait.until(
             EC.presence_of_element_located((By.ID, "check_all_label"))
         )
         try:
-            checkAllButton.click()  # selects all files
+            # Files will be selected individually for alt reports
+            if not search_all:
+                checkAllButton.click()  # selects all files
+
             bulkDownloadButton.click()  # begin bulk download
             file_size = CompleteDownloadAndRename(filename)
         except ElementClickInterceptedException:
@@ -716,15 +764,13 @@ def main():
         for key, val in companyDict.items():
             if (curr_firm >= starting_index) and (curr_firm <= ending_index):
 
-                SearchActions(driver, val)  # Execute search page actions
-
-                # Update amt_downloaded
                 amt_downloaded_kb = CheckAndWait(
                     bar, amt_downloaded_kb
                 )  # Will wait an hour on trigger and reset amt to 0
-                amt_downloaded_kb = ResultActions(
-                    driver, bar, key, val, amt_downloaded_kb
-                )  # Adds file size to amt after check
+
+                amt_downloaded_kb = SearchActions(
+                    driver, bar, key, val, amt_downloaded_kb, False
+                )  # Execute search page actions
 
                 # firm complete
                 StoreIndex(curr_firm)  # mark completion
