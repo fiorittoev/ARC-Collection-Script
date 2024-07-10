@@ -7,6 +7,7 @@ pip insall alive-progress
 By Evan Fioritto
 """
 
+import downloadscript
 import os
 import zipfile
 import csv
@@ -16,6 +17,7 @@ import pandas as pd
 from PyPDF2.errors import PdfReadError
 from rapidfuzz import fuzz
 from alive_progress import alive_bar
+from getpass import getpass
 
 zip_directory = "./zips"
 folder_directory = "./folders"
@@ -50,20 +52,6 @@ def InitializeFiles():
                 "Date",
                 "DocType",
                 "Parent Zip",
-            ]
-        )
-
-    with open("matching.csv", "w", newline="") as csvfile:
-        w = csv.writer(csvfile)
-        w.writerow(
-            [
-                "GVKey",
-                "Company Name",
-                "Year",
-                "Data Date",
-                "Status",
-                "Year Match",
-                "File Count",
             ]
         )
 
@@ -268,6 +256,20 @@ def ValidateMatches():
     Return: void
     """
 
+    with open("matching.csv", "w", newline="") as csvfile:
+        w = csv.writer(csvfile)
+        w.writerow(
+            [
+                "GVKey",
+                "Company Name",
+                "Year",
+                "Data Date",
+                "Status",
+                "Year Match",
+                "File Count",
+            ]
+        )
+
     na_statuses = ["NA", "TL", "SK"]
     downloaded_files = []
 
@@ -334,6 +336,68 @@ def ValidateMatches():
                 MatchingAppend(
                     key, name, year, data_date, status, year_match, file_count
                 )
+
+
+def CreateMissingYearsDict():
+    """
+    Creates a dictionary for firms that were found but have missing years
+
+    Return: dictionary following format:
+        GVKEY : (Company name, [List of missing years])
+    """
+
+    ret = {}
+
+    with open("matching.csv", "r", newline="") as file:
+        reader = csv.reader(file)
+
+        for row in reader:
+
+            if row[4] == "OK" and row[5] == "N":  # gap year criteria
+
+                if row[0] not in ret:  # need to specify type on first encounter
+                    ret[row[0]] = (row[1], [row[2]])
+
+                else:  # if key has been created, we will add years
+                    ret[row[0]][1].append(row[2])
+
+    return ret
+
+
+def TertiaryCheck():
+    """
+    Iterates through matching.csv, finds companys that werent NA with gaps in years, downloads and tracks them
+    """
+
+    missing_years_dict = CreateMissingYearsDict()
+
+    # Need a webdriver as we will be downloading files in this function
+    driver = downloadscript.CreateDriver()
+    downloadscript.CompleteAuth(
+        driver,
+        input("Input a valid msu email to access mergent archives.\n"),
+        getpass("Input a valid msu password.\n"),
+    )
+
+    amt_downloaded_kb = 0.0  # needs to stay under 1800000 kb #should be zero
+
+    with alive_bar(len(missing_years_dict)) as bar:  # Progress bar
+
+        bar.text("Starting tertiary check for gap years...")
+        bar()
+
+        for key, val_list in missing_years_dict.items():
+
+            amt_downloaded_kb = downloadscript.CheckAndWait(bar, amt_downloaded_kb)
+
+            amt_downloaded_kb = downloadscript.SearchActions(
+                driver, bar, key, val_list[0], amt_downloaded_kb, True, val_list[1]
+            )  # search all will be true,
+
+            bar.text(str(amt_downloaded_kb / 1000000.0) + "GB Downloaded")
+            bar()
+
+    driver.quit()
 
 
 def MatchingAppend(key, name, year, data_date, status, year_match, file_count):
@@ -689,10 +753,12 @@ def CountMatches():
 
 def main():
 
-    InitializeFiles()
-    UnzipFiles()
-    OpenTrackers()
-    ValidateMatches()
+    # InitializeFiles()
+    # UnzipFiles()
+    # OpenTrackers()
+    # ValidateMatches()
+    TertiaryCheck()
+    ValidateMatches()  # Second validation
     VerifyPdfs()
     PrintStatistics()
     results = CountMatches()

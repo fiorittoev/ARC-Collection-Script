@@ -128,12 +128,14 @@ def CompleteAuth(driver, user, pw):
     # CHECK FOR HANG AFTER SUBMITBUTTON
 
 
-def SearchActions(driver, bar, key, val, total_download, search_all):
+def SearchActions(driver, bar, key, val, total_download, search_all, specific_years=[]):
     """
     All of the actions completed on the Search page, will land on results page
 
     driver -- webdriver element on the search page
     val -- string value, the company name
+    total_download -- kb downloaded in current cycle
+
     Return: void
     """
     # Wait until doctype box appears, signalling page load
@@ -169,12 +171,14 @@ def SearchActions(driver, bar, key, val, total_download, search_all):
     submitButton = driver.find_element(By.ID, "ext-gen224")
     submitButton.click()
 
-    total_download = ResultActions(driver, bar, key, val, total_download, search_all)
+    total_download = ResultActions(
+        driver, bar, key, val, total_download, search_all, specific_years
+    )
 
     return total_download
 
 
-def ResultActions(driver, bar, key, val, total_download, search_all):
+def ResultActions(driver, bar, key, val, total_download, search_all, specific_years=[]):
     """
     All of the actions completed on the Search Results page
 
@@ -350,7 +354,7 @@ def LoadTable(driver):
     return rows
 
 
-def ScrapeRows(driver, key, date_values, page_number, search_all):
+def ScrapeRows(driver, key, date_values, page_number, search_all, specific_years=[]):
     """
     Grabs date values from table of results
 
@@ -384,14 +388,19 @@ def ScrapeRows(driver, key, date_values, page_number, search_all):
 
             if not search_all or doc_div.text in valid_docs:
 
+                year = (year_div.text)[-4:]
+
                 # If were looking through multiple doctypes we need to select individual files
                 if search_all:
                     try:
+                        if len(specific_years) > 0:  # If looking for specific years
+                            if year not in specific_years:
+                                continue  # Will not toggle checkbox
                         (cells[0].find_element(By.TAG_NAME, "input")).click()
                     except (
                         ElementClickInterceptedException
                     ):  # Will only occur at small resolutions, not in headlessly
-                        continue
+                        continue  # Will not toggle checkbox
 
                 value = (size_div.text)[:-2]
                 units = size_div.text[-2:]
@@ -404,7 +413,7 @@ def ScrapeRows(driver, key, date_values, page_number, search_all):
                         value *= 1000000
                     page_size_kb += value
 
-                year = (year_div.text)[-4:]  # year will be last four digits
+                # year will be last four digits
 
                 if year not in invalids:  # Some empty values after last year
                     date_values.append(year)  # last 4 chars will always be the year
