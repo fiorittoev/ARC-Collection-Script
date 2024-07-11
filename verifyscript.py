@@ -2,6 +2,9 @@
 Creates a metadata csv based on two trackers and zips in their respective folders, unzips each zip, 
 then matches each file name to what data it should be holding and tracks within the metadata.csv
 
+Metadata - extrapolation off filestracker, pairing each entry with its location on disk
+Matching - relation of filestracker and zipreader to ARC_missing.csv
+
 requirements:
 pip insall alive-progress
 By Evan Fioritto

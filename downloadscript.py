@@ -1,6 +1,10 @@
 """
 Script for MSU Research to download 13k annual reports within batch zip files.
 
+Filestracker - every file that we have downloaded successfully
+Ziptracker - information scraped from each search, along with the status of the bulk download
+
+
 By Evan Fioritto
 
 requires:
@@ -243,7 +247,7 @@ def ResultActions(driver, bar, key, val, total_download, search_all, specific_ye
             page_size = scraperesults[1]
             filename = GenFileName(date_values, key, val, last_page_number, search_all)
 
-            if (page_size + total_download) <= 1900000:
+            if (page_size + total_download) <= 1800000:
 
                 if reportCountContainer.text == "0":
 
@@ -289,7 +293,7 @@ def ResultActions(driver, bar, key, val, total_download, search_all, specific_ye
 
                 if (
                     page_size + total_download
-                ) <= 1900000:  # if file greater than 180000 kb, mark and ship
+                ) <= 1800000:  # if file greater than 180000 kb, mark and ship
 
                     zipsize += BulkDownload(driver, filename, search_all)
                     total_download += zipsize
