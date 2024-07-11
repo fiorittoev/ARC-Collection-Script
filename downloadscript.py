@@ -247,6 +247,10 @@ def ResultActions(driver, bar, key, val, total_download, search_all, specific_ye
             page_size = scraperesults[1]
             filename = GenFileName(date_values, key, val, last_page_number, search_all)
 
+            total_download = CheckAndWait(
+                bar, total_download + page_size
+            )  # check in between each file
+
             if (page_size + total_download) <= 1800000:
 
                 if reportCountContainer.text == "0":
@@ -291,6 +295,10 @@ def ResultActions(driver, bar, key, val, total_download, search_all, specific_ye
                     date_values, key, val, str(current_page), search_all
                 )
 
+                total_download = CheckAndWait(
+                    bar, total_download + page_size
+                )  # check in between each file
+
                 if (
                     page_size + total_download
                 ) <= 1800000:  # if file greater than 180000 kb, mark and ship
@@ -305,6 +313,7 @@ def ResultActions(driver, bar, key, val, total_download, search_all, specific_ye
                     )
 
                 else:
+
                     WriteZipTracker(key, val, "TL")  # TL for too large
 
                 total_download = CheckAndWait(
