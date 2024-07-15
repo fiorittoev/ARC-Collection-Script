@@ -151,7 +151,7 @@ def GetFileInfo(key, zip_page, row_number):
     return 0, 0  # If iteration is complete with no matches, return 0s
 
 
-def OpenTrackers(erase):
+def OpenTrackers():
     """
     Iterate through both trackers, grabbing neccesary data from each for appendage into metadata csv
 
