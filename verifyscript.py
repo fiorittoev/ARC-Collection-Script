@@ -151,7 +151,7 @@ def GetFileInfo(key, zip_page, row_number):
     return 0, 0  # If iteration is complete with no matches, return 0s
 
 
-def OpenTrackers():
+def OpenTrackers(erase):
     """
     Iterate through both trackers, grabbing neccesary data from each for appendage into metadata csv
 
@@ -273,6 +273,7 @@ def ValidateMatches():
             ]
         )
 
+    valid_doctypes = ["10K or Int'l Equivalent", "Annual/10K Report", "Annual Report"]
     na_statuses = ["NA", "TL", "SK"]
     downloaded_files = []
 
@@ -287,7 +288,10 @@ def ValidateMatches():
         next(files_reader)
 
         for files_row in files_reader:
-            downloaded_files.append(files_row)
+            if (
+                files_row[5] in valid_doctypes
+            ):  # only care about valid doctypes, this will make other doctypes appear as N in the matching year column in matching.csv, signalling no file match
+                downloaded_files.append(files_row)
 
     with alive_bar(num_lines) as bar:  # Progress bar
         bar.text("Validating ARC_missing.csv matches with files")
@@ -756,12 +760,15 @@ def CountMatches():
 
 def main():
 
-    # InitializeFiles()
-    # UnzipFiles()
-    # OpenTrackers()
-    # ValidateMatches()
-    TertiaryCheck()
-    ValidateMatches()  # Second validation
+    InitializeFiles()
+    x = 0
+    while x < 2:
+        UnzipFiles()
+        OpenTrackers()
+        ValidateMatches()
+        if x == 0:
+            TertiaryCheck()
+        x += 1
     VerifyPdfs()
     PrintStatistics()
     results = CountMatches()

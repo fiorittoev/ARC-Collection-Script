@@ -163,7 +163,11 @@ def SearchActions(driver, bar, key, val, total_download, search_all, specific_ye
     # Two cases, annual reports or unfiltered doctype
     if search_all == False:
 
+        attempt_count = 0  # counter for doctype attempts, if it takes more than 5, download will proceed with selected doctype
+
         while doctype.get_attribute("value") != "ANR":
+            if attempt_count > 10:
+                break
             # Scroll to top
             for x in range(0, 20):
                 documentQuery.send_keys(Keys.ARROW_UP)
@@ -171,6 +175,8 @@ def SearchActions(driver, bar, key, val, total_download, search_all, specific_ye
             for x in range(0, 3):
                 documentQuery.send_keys(Keys.ARROW_DOWN)
             documentQuery.send_keys(Keys.ENTER)
+
+            attempt_count += 1
 
     submitButton = driver.find_element(By.ID, "ext-gen224")
     submitButton.click()
@@ -234,13 +240,14 @@ def ResultActions(driver, bar, key, val, total_download, search_all, specific_ye
             load_sucess = 0
 
     if load_success == 1:
-
-        last_page_number = ((pageCountContainer.text).split())[-1]
-
+        try:
+            last_page_number = ((pageCountContainer.text).split())[-1]
+        except IndexError:
+            last_page_number = "1"
         # If there is only one page
         if last_page_number == "1":
             scraperesults = ScrapeRows(
-                driver, key, date_values, last_page_number, search_all
+                driver, key, date_values, last_page_number, search_all, specific_years
             )
 
             date_values = scraperesults[0]
@@ -264,18 +271,23 @@ def ResultActions(driver, bar, key, val, total_download, search_all, specific_ye
                         driver.get(
                             "https://www-mergentarchives-com.proxy1.cl.msu.edu/search.php"
                         )
-                        SearchActions(
+                        total_download = SearchActions(
                             driver, bar, key, val, total_download, True
                         )  # Search again, no filter this time
 
                 else:
+
                     zipsize = BulkDownload(driver, filename, search_all)
                     WriteZipTracker(key, val, last_page_number)
+                    total_download += zipsize
+                    if filename:
+                        bar.text(
+                            str((total_download + zipsize) / 1000000.0)
+                            + "GB Downloaded"
+                        )
 
             else:
                 WriteZipTracker(key, val, "TL")  # TL for too large
-
-            total_download += zipsize
 
         # multiple pages
         else:
@@ -286,7 +298,7 @@ def ResultActions(driver, bar, key, val, total_download, search_all, specific_ye
                 zipsize = 0
 
                 scraperesults = ScrapeRows(
-                    driver, key, date_values, current_page, search_all
+                    driver, key, date_values, current_page, search_all, specific_years
                 )
 
                 date_values = scraperesults[0]
@@ -302,18 +314,18 @@ def ResultActions(driver, bar, key, val, total_download, search_all, specific_ye
                 if (
                     page_size + total_download
                 ) <= 1800000:  # if file greater than 180000 kb, mark and ship
-
                     zipsize += BulkDownload(driver, filename, search_all)
                     total_download += zipsize
                     date_values.clear()  # need seperate ranges for each page's zip
 
                     WriteZipTracker(key, val, str(current_page))
-                    bar.text(
-                        str((total_download + zipsize) / 1000000.0) + "GB Downloaded"
-                    )
+                    if filename:
+                        bar.text(
+                            str((total_download + zipsize) / 1000000.0)
+                            + "GB Downloaded"
+                        )
 
                 else:
-
                     WriteZipTracker(key, val, "TL")  # TL for too large
 
                 total_download = CheckAndWait(
@@ -323,11 +335,16 @@ def ResultActions(driver, bar, key, val, total_download, search_all, specific_ye
                 if current_page != int(last_page_number):
                     # Go to next page
                     current_page += 1
-                    wait = WebDriverWait(driver, 30)
-                    pageQuery = wait.until(
-                        EC.presence_of_element_located((By.ID, "ext-gen147"))
-                    )
-
+                    wait = WebDriverWait(driver, 60)
+                    try:
+                        pageQuery = wait.until(
+                            EC.presence_of_element_located((By.ID, "ext-gen147"))
+                        )
+                    except TimeoutError:
+                        driver.refresh()
+                        pageQuery = wait.until(
+                            EC.presence_of_element_located((By.ID, "ext-gen147"))
+                        )
                     pageQuery.send_keys(Keys.CONTROL + "a")
                     pageQuery.send_keys(Keys.BACK_SPACE)
                     pageQuery.send_keys(current_page)
@@ -450,7 +467,7 @@ def GenFileName(date_values, key, val, page, search_all):
     Generates a file name, empty if date_values is empty
 
     date_values -- list of years
-    Return: formated string : companykey+clickedterm+minyear+maxyear all seperated by '_'
+    Return: formated string : companykey + clickedterm + minyear+ maxyear all seperated by '_'
     """
     filename = ""
     # Store oldest and most recent dates
@@ -554,7 +571,11 @@ def CompleteDownloadAndRename(filename):
                 break
             except FileNotFoundError:
                 continue
-        file_size_kb = os.path.getsize(most_recent_file) / 1024
+
+        try:
+            file_size_kb = os.path.getsize(most_recent_file) / 1024
+        except FileNotFoundError:
+            file_size_kb = 0.0
 
         # Only rename if file is fully downloaded
         if most_recent_file.endswith(".crdownload") or most_recent_file.endswith(
@@ -773,7 +794,7 @@ def main():
         CompleteAuth(driver, msuUser, msuPass)  # Execute authorization page actions
 
     # Initialize loop variables
-    amt_downloaded_kb = 0.0  # needs to stay under 1800000 kb #should be zero
+    amt_downloaded_kb = 0  # needs to stay under 1800000 kb #should be zero
     curr_firm = 1  # Start on first firm
 
     # Progress bar to visualize download eta
@@ -796,7 +817,6 @@ def main():
 
                 # firm complete
                 StoreIndex(curr_firm)  # mark completion
-                bar.text(str(amt_downloaded_kb / 1000000.0) + "GB Downloaded")
 
             curr_firm += 1
             bar()  # update bar progress after each company
