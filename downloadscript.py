@@ -21,6 +21,7 @@ import zipfile
 from selenium import webdriver
 from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import ElementClickInterceptedException
+from selenium.common.exceptions import StaleElementReferenceException
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -79,7 +80,7 @@ def CreateDriver():
     chrome_options.add_argument("--window-size=1920,1080")
     # ignore errors
     chrome_options.add_argument("--disable-gpu")
-    chrome_options.add_argument("--headless=new")
+    # chrome_options.add_argument("--headless=new")
     chrome_options.add_argument("--ignore-certificate-errors")
     chrome_options.add_argument("--ignore-certificate-errors-spki-list")
     chrome_options.add_argument("--ignore-ssl-errors")
@@ -143,47 +144,55 @@ def SearchActions(driver, bar, key, val, total_download, search_all, specific_ye
     Return: void
     """
     # Wait until doctype box appears, signalling page load
+    load_success = 0
     wait = WebDriverWait(driver, 15)
-    documentQuery = wait.until(EC.presence_of_element_located((By.ID, "ext-comp-1014")))
+    try:
+        documentQuery = wait.until(
+            EC.presence_of_element_located((By.ID, "ext-comp-1014"))
+        )
+        load_success = 1
+    except:
+        WriteZipTracker(key, val, "SK")
+        driver.refresh()
+    if load_success:
+        documentQuery.click()
+        # Wait for inner dropdown menu wrapper
+        doctype = driver.find_element(
+            By.ID,
+            "doctype",
+        )
 
-    documentQuery.click()
-    # Wait for inner dropdown menu wrapper
-    doctype = driver.find_element(
-        By.ID,
-        "doctype",
-    )
+        companyQuery = driver.find_element(
+            By.NAME, "companyName"
+        )  # element that holds company name
+        companyQuery.send_keys(val)
 
-    companyQuery = driver.find_element(
-        By.NAME, "companyName"
-    )  # element that holds company name
-    companyQuery.send_keys(val)
+        wait.until(EC.presence_of_element_located((By.ID, "ext-gen302")))
 
-    wait.until(EC.presence_of_element_located((By.ID, "ext-gen302")))
+        # Two cases, annual reports or unfiltered doctype
+        if search_all == False:
 
-    # Two cases, annual reports or unfiltered doctype
-    if search_all == False:
+            attempt_count = 0  # counter for doctype attempts, if it takes more than 5, download will proceed with selected doctype
 
-        attempt_count = 0  # counter for doctype attempts, if it takes more than 5, download will proceed with selected doctype
+            while doctype.get_attribute("value") != "ANR":
+                if attempt_count > 10:
+                    break
+                # Scroll to top
+                for x in range(0, 20):
+                    documentQuery.send_keys(Keys.ARROW_UP)
+                # Select ANR
+                for x in range(0, 3):
+                    documentQuery.send_keys(Keys.ARROW_DOWN)
+                documentQuery.send_keys(Keys.ENTER)
 
-        while doctype.get_attribute("value") != "ANR":
-            if attempt_count > 10:
-                break
-            # Scroll to top
-            for x in range(0, 20):
-                documentQuery.send_keys(Keys.ARROW_UP)
-            # Select ANR
-            for x in range(0, 3):
-                documentQuery.send_keys(Keys.ARROW_DOWN)
-            documentQuery.send_keys(Keys.ENTER)
+                attempt_count += 1
 
-            attempt_count += 1
+        submitButton = driver.find_element(By.ID, "ext-gen224")
+        submitButton.click()
 
-    submitButton = driver.find_element(By.ID, "ext-gen224")
-    submitButton.click()
-
-    total_download = ResultActions(
-        driver, bar, key, val, total_download, search_all, specific_years
-    )
+        total_download = ResultActions(
+            driver, bar, key, val, total_download, search_all, specific_years
+        )
 
     return total_download
 
@@ -254,9 +263,10 @@ def ResultActions(driver, bar, key, val, total_download, search_all, specific_ye
             page_size = scraperesults[1]
             filename = GenFileName(date_values, key, val, last_page_number, search_all)
 
-            total_download = CheckAndWait(
-                bar, total_download + page_size
-            )  # check in between each file
+            if total_download != 0.0:
+                total_download = CheckAndWait(
+                    bar, total_download + page_size
+                )  # check in between each file
 
             if (page_size + total_download) <= 1800000:
 
@@ -297,19 +307,30 @@ def ResultActions(driver, bar, key, val, total_download, search_all, specific_ye
 
                 zipsize = 0
 
-                scraperesults = ScrapeRows(
-                    driver, key, date_values, current_page, search_all, specific_years
-                )
+                try:
+                    scraperesults = ScrapeRows(
+                        driver,
+                        key,
+                        date_values,
+                        current_page,
+                        search_all,
+                        specific_years,
+                    )
+                except StaleElementReferenceException:
+                    driver.refresh()
+                    current_page += 1
+                    WriteZipTracker(key, val, "SK")
+                    break
 
                 date_values = scraperesults[0]
                 page_size = scraperesults[1]
                 filename = GenFileName(
                     date_values, key, val, str(current_page), search_all
                 )
-
-                total_download = CheckAndWait(
-                    bar, total_download + page_size
-                )  # check in between each file
+                if total_download != 0.0:
+                    total_download = CheckAndWait(
+                        bar, total_download + page_size
+                    )  # check in between each file
 
                 if (
                     page_size + total_download
@@ -336,15 +357,16 @@ def ResultActions(driver, bar, key, val, total_download, search_all, specific_ye
                     # Go to next page
                     current_page += 1
                     wait = WebDriverWait(driver, 60)
+
                     try:
                         pageQuery = wait.until(
                             EC.presence_of_element_located((By.ID, "ext-gen147"))
                         )
-                    except TimeoutError:
+                    except TimeoutException:
                         driver.refresh()
-                        pageQuery = wait.until(
-                            EC.presence_of_element_located((By.ID, "ext-gen147"))
-                        )
+                        WriteZipTracker(key, val, "SK")
+                        break
+
                     pageQuery.send_keys(Keys.CONTROL + "a")
                     pageQuery.send_keys(Keys.BACK_SPACE)
                     pageQuery.send_keys(current_page)
@@ -352,6 +374,7 @@ def ResultActions(driver, bar, key, val, total_download, search_all, specific_ye
                 else:
                     break
     else:
+        driver.refresh()
         WriteZipTracker(key, val, "SK")
 
     # After either case, we go back to resume search
