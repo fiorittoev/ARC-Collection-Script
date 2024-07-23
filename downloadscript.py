@@ -80,7 +80,7 @@ def CreateDriver():
     chrome_options.add_argument("--window-size=1920,1080")
     # ignore errors
     chrome_options.add_argument("--disable-gpu")
-    # chrome_options.add_argument("--headless=new")
+    chrome_options.add_argument("--headless=new")
     chrome_options.add_argument("--ignore-certificate-errors")
     chrome_options.add_argument("--ignore-certificate-errors-spki-list")
     chrome_options.add_argument("--ignore-ssl-errors")
@@ -154,6 +154,7 @@ def SearchActions(driver, bar, key, val, total_download, search_all, specific_ye
     except:
         WriteZipTracker(key, val, "SK")
         driver.refresh()
+        time.sleep(2)
     if load_success:
         documentQuery.click()
         # Wait for inner dropdown menu wrapper
@@ -317,9 +318,10 @@ def ResultActions(driver, bar, key, val, total_download, search_all, specific_ye
                         specific_years,
                     )
                 except StaleElementReferenceException:
-                    driver.refresh()
                     current_page += 1
                     WriteZipTracker(key, val, "SK")
+                    driver.refresh()
+                    time.sleep(2)
                     break
 
                 date_values = scraperesults[0]
