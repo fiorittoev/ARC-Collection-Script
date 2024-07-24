@@ -1,3 +1,9 @@
+"""
+Creates statistics base off of matching.csv
+
+Evan Fioritto
+"""
+
 import csv
 
 
