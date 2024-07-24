@@ -1,5 +1,5 @@
 """
-Creates statistics base off of matching.csv
+Creates statistics based off of matching.csv
 
 Evan Fioritto
 """
