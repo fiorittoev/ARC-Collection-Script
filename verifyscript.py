@@ -333,12 +333,14 @@ def ValidateMatches():
                 if status == "OK":
 
                     for item in downloaded_files:
-                        if (
-                            item[4].split("/")[-1] == year and item[0] == key
-                        ):  # Account for match if GVkey and exact year match
+                        if (item[4].split("/")[-1] == year) and item[0] == key:
                             year_match = "Y"
                             file_count += 1
                 bar()
+                # item[4].split("/")[-1] == year FOR YEAR  # Account for match if GVkey and exact year match
+
+                # item[4].split("/")[-1] == data_date.split("-")[0]
+                #            or item[4].split("/")[-1] == year
 
                 MatchingAppend(
                     key, name, year, data_date, status, year_match, file_count
@@ -762,13 +764,13 @@ def main():
 
     InitializeFiles()
     x = 0
-    while x < 2:
+    while x < 1:
         UnzipFiles()
         OpenTrackers()
         ValidateMatches()
         if x == 0:
             TertiaryCheck()
-        x += 1
+            x += 1
     VerifyPdfs()
     PrintStatistics()
     results = CountMatches()
