@@ -8,6 +8,7 @@ import downloadscript
 import verifyscript
 import analyzeresults
 import copy_found_firms
+import OCRscript
 
 
 def main():
@@ -15,6 +16,7 @@ def main():
     verifyscript.main()
     analyzeresults.main()
     copy_found_firms.main()
+    OCRscript.main()
 
 
 if __name__ == "__main__":
