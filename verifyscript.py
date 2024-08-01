@@ -769,11 +769,14 @@ def main():
         OpenTrackers()
         ValidateMatches()
         if x == 0:
-            TertiaryCheck()
+            TertiaryCheck()  # Downloads files from firms with OK status
             x += 1
+
     VerifyPdfs()
     PrintStatistics()
+
     results = CountMatches()
+
     print(str(results[1]) + "Matches to search terms confirmed")
 
     return 0
