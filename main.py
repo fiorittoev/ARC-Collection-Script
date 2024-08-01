@@ -7,7 +7,7 @@ Evan Fioritto
 import downloadscript
 import verifyscript
 import analyzeresults
-import copy_found_firms
+import copyfoundfirms
 import OCRscript
 
 
@@ -15,7 +15,7 @@ def main():
     downloadscript.main()
     verifyscript.main()
     analyzeresults.main()
-    copy_found_firms.main()
+    copyfoundfirms.main()
     OCRscript.main()
 
 

@@ -113,8 +113,6 @@ def ParseBody(parser, text):
 
             except requests.exceptions.ReadTimeout:
                 continue
-        if len(paragraphs) > 10:
-            break
 
     return paragraphs
 
@@ -179,6 +177,29 @@ def GetICGaugeScore(text):
     return val_total / total  # Average predicted semantic score
 
 
+def FormatResult(result):
+    """
+    Remove tables from OCR'd text, maintain space between paragraphs
+    result - return type of model(doc)
+    return - string
+    """
+
+    ret = ""
+
+    for page in result.pages:
+        for block in page.blocks:
+            for line in block.lines:
+                words = [word.value for word in line.words]
+                if (
+                    len(words) > 5
+                ):  # Only parse lines with 5 or more words, filters out tabular or incomplete data
+                    ret += " ".join(words) + "\n"
+            if len(block.lines) > 0:
+                ret += "\n"
+
+    return ret
+
+
 def main():
 
     server, model = OCRSetup()
@@ -191,12 +212,14 @@ def main():
     result = model(doc)
     out = result.render()
 
+    formatted_text = FormatResult(result)
+
     # TEMP TO VIEW OUTPUT
     f = open("temp.txt", "w")
-    f.write(out)
+    f.write(formatted_text)
     f.close()
 
-    complexity = GetICGaugeScore(out)
+    complexity = GetICGaugeScore(formatted_text)
     print(complexity)
 
     server.terminate()
