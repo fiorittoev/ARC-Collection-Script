@@ -309,9 +309,9 @@ def main():
                     WriteComplexity(val, GetICGaugeScore(formatted_text))
                 StoreIndex(curr_firm)
 
-        curr_firm += 1
-        bar()
-
+            curr_firm += 1
+            bar()
+            
     server.terminate()
 
 
