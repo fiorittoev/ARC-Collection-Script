@@ -33,6 +33,7 @@ For MSU College of Business - Management Department
 - **found_firms.csv**: Collection of all desired entries with a GVKey and year match with at least one file. Of format: [GVKey, Company Name, Year, Data Date, File Count]
 - **missing_firms.csv**: Collection of all desired entries either not on Mergent or not with a year match. Of format: [GVKey, Company Name, Year, Data Date, Status]
 - **confirmations.csv**: Basic OCR results validating actual contents of PDFs derived from `metadata.csv`. [Path, GVKey, HH Name, Mergent Name, Year, Doctype Confirmed, Name Confirmed, Year Confirmed, Index in missing.csv]
+- **complexities.csv**: Semantic complexities of files ran through OCRscript. [GVKey, HH name, Mergent Year]
 
 
 ## Folder Explanations
@@ -41,9 +42,10 @@ For MSU College of Business - Management Department
 - **/trackers**: csv files containing information about all zips and files downloaded by `downloadscript.py`
 - **/matched_folders**: folders with a proved correlation to `ARC_mising.csv`
 - **/sample_data**: folder containing json training data `toy.json` for icgauge to compare against in `OCRscript.py`, will run significantly slower on machines will low specifications
+- **/extracted_text**: folder containing text extractions for files passed through OCRscript.py
 
 # Other
-- **lastindex.txt**: the index of unique firm last reached in `downloadscript.py`, used to store globally across runs
+- **lastindex.txt**: the index of unique firm last reached in `downloadscript.py` or `OCRscript.py`, used to store globally across runs
 - **temp.json**: file to hold NLP parsed data for icgauge validation in `OCRscript.py`
 
 ## Abbreviations

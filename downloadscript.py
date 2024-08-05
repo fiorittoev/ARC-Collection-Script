@@ -736,31 +736,34 @@ def CheckAndWait(bar, amt_downloaded_kb):
     return amt_downloaded_kb
 
 
-def GetIndices():
+def GetIndices(size):
     """
     Prompt user for Indices for use as parameters for search, both inclusive
-
+    size- int max value
     Return: two ints, first is starting index, second is ending_index
     """
     # Loop until input is valid
+    size = str(size)
     while 1:
         starting_index = input(
-            "Input starting firm index (1-958), 'c' to continue from last index stored\n"
+            "Input starting firm index (1-"
+            + size
+            + "), 'c' to continue from last index stored\n"
         )
-        ending_index = input("Input ending firm index (1-958)\n")
+        ending_index = input("Input ending firm index (1-" + size + ")\n")
 
         if starting_index.isnumeric() and ending_index.isnumeric():
             starting_index = int(starting_index)  # strings to int
             ending_index = int(ending_index)
             if (
-                (starting_index >= 1 and starting_index <= 958)
-                and (ending_index >= 1 and ending_index <= 958)
+                (starting_index >= 1 and starting_index <= size)
+                and (ending_index >= 1 and ending_index <= size)
                 and (starting_index <= ending_index)
             ):
                 break  # If within safe bounds, return
         elif starting_index == "c" and ending_index.isnumeric():
             ending_index = int(ending_index)
-            if (ending_index >= 1 and ending_index <= 958) and (
+            if (ending_index >= 1 and ending_index <= size) and (
                 GetIndex() <= ending_index
             ):
                 starting_index = GetIndex()
@@ -794,13 +797,39 @@ def GetIndex():
     return ret
 
 
+def ResetIndex(query):
+    """
+    Optional queries then resets lastindex.txt to 0 if accepted
+    query- bool if we would like to query
+    Return: void or 0
+    """
+    if query:
+        ans = input("Reset download progress? (Y/N)")
+        if ans == "Y":
+            f = open("lastindex.txt", "w")
+            f.write(str(0))
+            f.close()
+        elif ans == "N":
+            return 0  # break
+        else:
+            print("Invalid, enter Y or N")
+            ResetIndex(True)  # try again if not Y or N
+    else:
+        f = open("lastindex.txt", "w")
+        f.write(str(0))
+        f.close()
+
+
 def main():
 
     # Create company dictionary for iteration
     companyDict = GetDict()
 
+    # Query for index reset
+    ResetIndex(True)
+
     # Gather search parameters
-    starting_index, ending_index = GetIndices()
+    starting_index, ending_index = GetIndices(len(companyDict))
 
     # Create Webdriver and tracker files
     driver = CreateDriver()
