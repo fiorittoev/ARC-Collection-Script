@@ -1,0 +1,102 @@
+[
+    {
+        "parse": [
+            "(ROOT\n  (FRAG\n    (PRN\n      (SINV\n        (VP (VB Sing) (, ,) (INTJ (UH O)))\n        (NP\n          (NP (NN goddess))\n          (, ,)\n          (NP\n            (NP (DT the) (NN anger))\n            (PP\n              (IN of)\n              (NP\n                (NP (NNP Achilles) (NN son))\n                (PP (IN of) (NP (NNP Peleus))))))\n          (, ,))))\n    (SBAR (IN that) (FRAG (VP (VBN brought))))))",
+            "(ROOT\n  (S\n    (NP\n      (NP (JJ countless) (NNS ills))\n      (PP (IN upon) (NP (DT the) (NNPS Achaeans))))\n    (. .)\n    (NP (PDT Many) (DT a) (JJ brave) (NN soul))\n    (VP (VBD did) (S (NP (PRP it)) (VP (VB send))))))",
+            "(ROOT\n  (S\n    (S\n      (VP\n        (VBG hurrying)\n        (PRT (RP down))\n        (PP (IN to) (NP (NNP Hades)))))\n    (, ,)\n    (CC and)\n    (NP (JJ many) (DT a) (NN hero))\n    (VP\n      (VBD did)\n      (S\n        (NP (PRP it))\n        (VP\n          (VB yield)\n          (NP (DT a) (NN prey))\n          (PP (IN to) (NP (NNS dogs))))))))",
+            "(ROOT\n  (S\n    (CC and)\n    (NP\n      (NP (NNS vultures))\n      (, ,)\n      (SBAR\n        (IN for)\n        (S\n          (ADVP (RB so))\n          (VP\n            (VBD were)\n            (NP\n              (NP (DT the) (SBAR (S (VP (VBZ counsels)))))\n              (PP (IN of) (NP (NNP Jove))))))))\n    (VP (VBD fulfilled) (PP (IN from) (NP (DT the) (NN day))))))"
+        ],
+        "paragraph": "\nSing, O goddess, the anger of Achilles son of Peleus, that brought\ncountless ills upon the Achaeans. Many a brave soul did it send\nhurrying down to Hades, and many a hero did it yield a prey to dogs\nand vultures, for so were the counsels of Jove fulfilled from the day",
+        "score": 7
+    },
+    {
+        "parse": [
+            "(ROOT\n  (PP\n    (IN on)\n    (NP\n      (NP\n        (NP (WDT which))\n        (NP (NP (DT the) (NN son)) (PP (IN of) (NP (NNP Atreus)))))\n      (, ,)\n      (NP (NP (NN king)) (PP (IN of) (NP (NNS men))))\n      (, ,)\n      (CC and)\n      (NP (NP (JJ great) (NNP Achilles)) (, ,) (ADVP (RB first))))))",
+            "(ROOT\n  (S\n    (VP\n      (VBD fell)\n      (PRT (RP out))\n      (PP (IN with) (NP (CD one) (DT another))))\n    (. .)))",
+            "(ROOT\n  (S\n    (CC And)\n    (PRN\n      (SBARQ\n        (WHNP\n          (WHNP (WDT which))\n          (PP (IN of) (NP (DT the) (NNS gods))))\n        (SQ\n          (VBD was)\n          (NP (PRP it))\n          (SBAR\n            (S\n              (NP (DT that))\n              (VP\n                (VBD set)\n                (NP (PRP them))\n                (PP (IN on) (PP (IN to) (NP (NN quarrel))))))))\n        (. ?)))\n    (NP (PRP It))\n    (VP (VBD was) (NP (DT the)))))",
+            "(ROOT\n  (S\n    (NP\n      (NP\n        (NP (NN son))\n        (PP (IN of) (NP (NNP Jove) (CC and) (NNP Leto))))\n      (: ;)\n      (PP (IN for) (NP (PRP he))))\n    (VP\n      (VP\n        (VBD was)\n        (ADJP (JJ angry) (PP (IN with) (NP (DT the) (NN king)))))\n      (CC and)\n      (VP (VBD sent) (NP (DT a))))))"
+        ],
+        "paragraph": "on which the son of Atreus, king of men, and great Achilles, first\nfell out with one another.\n\nAnd which of the gods was it that set them on to quarrel? It was the\nson of Jove and Leto; for he was angry with the king and sent a",
+        "score": 6
+    },
+    {
+        "parse": [
+            "(ROOT\n  (NP\n    (NP\n      (NP (NN pestilence))\n      (PP\n        (IN upon)\n        (NP\n          (DT the)\n          (NN host)\n          (S\n            (VP\n              (TO to)\n              (VP\n                (VB plague)\n                (NP (DT the) (NNS people))\n                (, ,)\n                (PP (IN because) (NP (DT the) (NN son)))))))))\n    (X (IN of))))",
+            "(ROOT\n  (S\n    (PRN\n      (S\n        (NP (NNP Atreus))\n        (VP\n          (VBD had)\n          (VP\n            (VBN dishonoured)\n            (NP (NP (NNPS Chryses)) (NP (PRP$ his) (NN priest)))))\n        (. .)))\n    (ADVP (RB Now))\n    (NP (NNP Chryses))\n    (VP (VBD had) (VP (VBN come) (PP (IN to) (NP (DT the)))))))",
+            "(ROOT\n  (FRAG\n    (NP (NP (NNS ships)) (PP (IN of) (NP (DT the) (NNPS Achaeans))))\n    (S\n      (VP\n        (TO to)\n        (VP\n          (VP (VB free) (NP (PRP$ his) (NN daughter)))\n          (, ,)\n          (CC and)\n          (VP\n            (VBD had)\n            (VP (VBN brought) (PP (IN with) (NP (PRP him) (DT a))))))))))",
+            "(ROOT\n  (FRAG\n    (NP (JJ great) (NN ransom))\n    (: :)\n    (S\n      (ADVP (RB moreover))\n      (NP (PRP he))\n      (VP\n        (VBD bore)\n        (PP (IN in) (NP (PRP$ his) (NN hand)))\n        (NP\n          (NP (DT the) (NN sceptre))\n          (PP (IN of) (NP (NNP Apollo))))))))"
+        ],
+        "paragraph": "pestilence upon the host to plague the people, because the son of\nAtreus had dishonoured Chryses his priest. Now Chryses had come to the\nships of the Achaeans to free his daughter, and had brought with him a\ngreat ransom: moreover he bore in his hand the sceptre of Apollo",
+        "score": 3
+    },
+    {
+        "parse": [
+            "(ROOT\n  (S\n    (S\n      (VP\n        (VBN wreathed)\n        (PP\n          (IN with)\n          (NP (NP (DT a) (NN suppliant) (POS \u2019s)) (NN wreath)))))\n    (CC and)\n    (S\n      (NP (PRP he))\n      (VP\n        (VBD besought)\n        (NP (DT the) (NNPS Achaeans))\n        (, ,)\n        (ADVP (CC but))))))",
+            "(ROOT\n  (NP\n    (NP (JJS most))\n    (PP (IN of) (NP (PDT all) (DT the) (CD two) (NNS sons)))\n    (PP\n      (IN of)\n      (NP\n        (NP (NNP Atreus))\n        (, ,)\n        (SBAR\n          (WHNP (WP who))\n          (S (VP (VBD were) (NP (PRP$ their) (NNS chiefs)))))))\n    (. .)))",
+            "(ROOT\n  (S\n    (`` \")\n    (NP\n      (NP\n        (NP (NNS Sons))\n        (PP (IN of) (NP (NNP Atreus)))\n        (PRN (, ,) ('' \") (S (NP (PRP he)) (VP (VBD cried))) (, ,)))\n      ('' \")\n      (CC and)\n      (NP (DT all) (JJ other) (NNPS Achaeans)))\n    (, ,)\n    (VP\n      (MD may)\n      (VP (NP (NP (DT the) (NNS gods)) (SBAR (WHNP (WP who))))))))",
+            "(ROOT\n  (S\n    (VP\n      (VB dwell)\n      (PP (IN in) (NP (NNP Olympus) (NN grant)))\n      (NP (PRP you))\n      (PP\n        (IN to)\n        (NP\n          (NP (NN sack))\n          (NP\n            (NP\n              (NP (DT the) (NN city))\n              (PP (IN of) (NP (NNP Priam))))\n            (, ,)\n            (CC and)\n            (S (VP (TO to) (VP (VB reach))))))))))"
+        ],
+        "paragraph": "wreathed with a suppliant\u2019s wreath and he besought the Achaeans, but\nmost of all the two sons of Atreus, who were their chiefs.\n\n\"Sons of Atreus,\" he cried, \"and all other Achaeans, may the gods who\ndwell in Olympus grant you to sack the city of Priam, and to reach",
+        "score": 3
+    },
+    {
+        "parse": [
+            "(ROOT\n  (FRAG\n    (NP (NP (PRP$ your) (NNS homes)) (PP (IN in) (NP (NN safety))))\n    (: ;)\n    (S\n      (VP\n        (CC but)\n        (VP (VB free) (NP (PRP$ my) (NN daughter)))\n        (, ,)\n        (CC and)\n        (VP (VB accept) (NP (DT a) (NN ransom)) (PP (IN for)))))))",
+            "(ROOT\n  (FRAG\n    (NP (PRP her))\n    (, ,)\n    (PP\n      (IN in)\n      (NP\n        (NP (NN reverence))\n        (PP\n          (IN to)\n          (NP\n            (NP (NNP Apollo))\n            (, ,)\n            (NP (NP (NN son)) (PP (IN of) (NP (NNP Jove))))))))\n    (. .)\n    ('' \")))",
+            "(ROOT\n  (S\n    (PP (IN On) (NP (DT this)))\n    (NP\n      (NP (DT the) (NN rest))\n      (PP\n        (IN of)\n        (NP\n          (NP (DT the) (NNPS Achaeans))\n          (PP (IN with) (NP (CD one) (NN voice))))))\n    (VP (VBD were) (PP (IN for) (S (VP (VBG respecting)))))))",
+            "(ROOT\n  (UCP\n    (NP (DT the) (NN priest))\n    (CC and)\n    (S\n      (VP\n        (VBG taking)\n        (NP (DT the) (NN ransom))\n        (SBAR\n          (IN that)\n          (S\n            (NP (PRP he))\n            (VP\n              (VP (VBD offered))\n              (: ;)\n              (CC but)\n              (NP (RB not) (RB so)))))))))"
+        ],
+        "paragraph": "your homes in safety; but free my daughter, and accept a ransom for\nher, in reverence to Apollo, son of Jove.\"\n\nOn this the rest of the Achaeans with one voice were for respecting\nthe priest and taking the ransom that he offered; but not so",
+        "score": 5
+    },
+    {
+        "parse": [
+            "(ROOT\n  (NP\n    (NP (NNP Agamemnon))\n    (, ,)\n    (NP\n      (NP (NP (NN son)) (PP (IN of) (NP (NNP Atreus))))\n      (, ,)\n      (SBAR\n        (WHNP (WP who))\n        (S\n          (VP\n            (VP\n              (VBD spoke)\n              (ADVP (RB fiercely))\n              (PP (IN to) (NP (PRP him))))\n            (CC and)\n            (VP (VBD sent) (NP (PRP him)))))))))",
+            "(ROOT\n  (S\n    (SBAR\n      (ADVP (RB roughly) (RB away) (. .))\n      (S\n        (NP ('' \"))\n        (NP\n          (NP (JJ Old) (NN man))\n          (PRN\n            (, ,)\n            ('' \")\n            (SINV (VP (VBD said)) (NP (PRP he)))\n            (, ,))\n          (`` \"))))\n    (VP\n      (VB let)\n      (S\n        (NP (PRP me))\n        (RB not)\n        (VP\n          (VB find)\n          (S (NP (PRP you)) (VP (VBG tarrying) (ADVP (RB about)))))))))",
+            "(ROOT\n  (FRAG\n    (NP (NP (PRP$ our) (NNS ships)) (, ,) (NP (CC nor)))\n    (S\n      (VP\n        (CC yet)\n        (VP\n          (VBG coming)\n          (ADVP (RB hereafter) (. .))\n          (NP\n            (NP (PRP$ Your) (NN sceptre))\n            (PP (IN of) (NP (DT the) (NN god)))))\n        (CC and)\n        (NP (PRP$ your))))))",
+            "(ROOT\n  (S\n    (PRN\n      (S\n        (NP (NN wreath))\n        (VP\n          (MD shall)\n          (VP (VB profit) (NP (PRP you)) (ADVP (NN nothing))))\n        (. .)))\n    (PRN\n      (S\n        (NP (PRP I))\n        (VP (MD will) (RB not) (VP (VB free) (NP (PRP her))))\n        (. .)))\n    (NP (PRP She))\n    (VP (MD shall) (VP (VB grow)))))"
+        ],
+        "paragraph": "Agamemnon, son of Atreus, who spoke fiercely to him and sent him\nroughly away. \"Old man,\" said he, \"let me not find you tarrying about\nour ships, nor yet coming hereafter. Your sceptre of the god and your\nwreath shall profit you nothing. I will not free her. She shall grow",
+        "score": 3
+    },
+    {
+        "parse": [
+            "(ROOT\n  (FRAG\n    (ADJP (JJ old))\n    (PP\n      (IN in)\n      (NP\n        (NP\n          (NP (PRP$ my) (NN house))\n          (PP\n            (IN at)\n            (NP\n              (NP (NNP Argos))\n              (ADVP\n                (RB far)\n                (PP (IN from) (NP (PRP$ her) (JJ own) (NN home)))))))\n        (, ,)\n        (VP (VBG busying) (NP (PRP herself)) (PP (IN with)))))))",
+            "(ROOT\n  (S\n    (PRN\n      (S\n        (NP (PRP her))\n        (VP\n          (VP\n            (VP (VB loom))\n            (CC and)\n            (VP\n              (VBG visiting)\n              (NP\n                (NP (DT the) (NNS altars))\n                (PP (IN of) (NP (DT the) (NNS gods))))\n              (PP (IN in) (NP (PRP$ her) (NN captivity)) (. .))))\n          (ADVP (RB So))\n          (VP (VB go))))\n      (, ,))))",
+            "(ROOT\n  (S\n    (CC and)\n    (VP\n      (VB do)\n      (RB not)\n      (VP\n        (VB provoke)\n        (NP (PRP me))\n        (SBAR\n          (IN if)\n          (S\n            (NP (PRP you))\n            (VP (MD would) (VP (VB be) (ADJP (JJ safe))))\n            (. .)\n            ('' \")))))))",
+            "(ROOT\n  (S\n    (PRN\n      (S\n        (NP (DT The) (JJ old) (NN man))\n        (VP\n          (VP (VBD feared) (NP (PRP him)))\n          (CC and)\n          (VP (VBD obeyed)))\n        (. .)))\n    (NP (RB Not) (DT a) (NN word))\n    (NP (PRP he))\n    (VP (VP (VBD spoke)) (, ,) (CC but) (VP (VBD went) (PP (IN by))))))"
+        ],
+        "paragraph": "old in my house at Argos far from her own home, busying herself with\nher loom and visiting the altars of the gods in her captivity. So go,\nand do not provoke me if you would be safe.\"\n\nThe old man feared him and obeyed. Not a word he spoke, but went by",
+        "score": 5
+    },
+    {
+        "parse": [
+            "(ROOT\n  (S\n    (S\n      (NP\n        (NP (DT the) (NN shore))\n        (PP (IN of) (NP (DT the) (ADJP (VBG sounding)) (NN sea)))))\n    (CC and)\n    (S\n      (VP\n        (VBD prayed)\n        (ADVP (RB apart))\n        (PP\n          (IN to)\n          (NP (NP (NNP King) (NNP Apollo)) (SBAR (WHNP (WP whom)))))))))",
+            "(ROOT\n  (S\n    (S\n      (NP\n        (NP (JJ lovely))\n        (SBAR\n          (S\n            (NP (NNP Leto))\n            (VP (VBD had) (VP (VBN borne)))\n            (. .)\n            ('' \"))))\n      (VP (VB Hear) (NP (PRP me))))\n    (, ,)\n    ('' \")\n    (NP (PRP he))\n    (VP\n      (VBD cried)\n      (, ,)\n      (`` \")\n      (FRAG\n        (INTJ (UH O))\n        (NP\n          (NP (NN god))\n          (PP (IN of) (NP (DT the) (NN silver) (NN bow))))))\n    (, ,)))",
+            "(ROOT\n  (NP\n    (NP\n      (NP (DT that) (NN protectest) (NN Chryse))\n      (CC and)\n      (NP (JJ holy) (NNP Cilla)))\n    (CC and)\n    (NP\n      (NP (JJS rulest) (NNS Tenedos))\n      (PP (IN with) (NP (PRP$ thy))))))",
+            "(ROOT\n  (S\n    (S\n      (VP\n        (MD might)\n        (, ,)\n        (VP\n          (VB hear)\n          (NP (PRP me))\n          (INTJ (JJ oh))\n          (NP (NP (PRP thou)) (PP (IN of) (NP (NNP Sminthe)))))))\n    (. .)\n    (S\n      (SBAR\n        (IN If)\n        (S\n          (NP (PRP I))\n          (VP\n            (VBP have)\n            (ADVP (RB ever))\n            (VP (VBN decked) (NP (PRP$ your) (NN temple)))))))))"
+        ],
+        "paragraph": "the shore of the sounding sea and prayed apart to King Apollo whom\nlovely Leto had borne. \"Hear me,\" he cried, \"O god of the silver bow,\nthat protectest Chryse and holy Cilla and rulest Tenedos with thy\nmight, hear me oh thou of Sminthe. If I have ever decked your temple",
+        "score": 4
+    },
+    {
+        "parse": [
+            "(ROOT\n  (PP\n    (IN with)\n    (NP\n      (NP (NNS garlands))\n      (, ,)\n      (CC or)\n      (S\n        (VP\n          (VBD burned)\n          (NP (PRP$ your) (NN thigh) (HYPH -) (NNS bones))\n          (PP\n            (IN in)\n            (NP\n              (NP (NN fat))\n              (PP (IN of) (NP (NNS bulls) (CC or) (NNS goats))))))))\n    (, ,)))",
+            "(ROOT\n  (S\n    (VP\n      (VP (VB grant) (NP (PRP$ my) (NN prayer)))\n      (, ,)\n      (CC and)\n      (VP\n        (VB let)\n        (SBAR\n          (S\n            (NP (PRP$ your) (NNS arrows))\n            (VP\n              (VBP avenge)\n              (NP (DT these) (PRP$ my) (NNS tears))\n              (PP (IN upon) (NP (DT the))))))))))",
+            "(ROOT (S (VP (NNS Danaans)) (. .) ('' \")))",
+            "(ROOT\n  (S\n    (ADVP (RB Thus))\n    (VP\n      (VBD did)\n      (S\n        (S (NP (PRP he)) (VP (VB pray)))\n        (, ,)\n        (CC and)\n        (S\n          (NP (NNP Apollo))\n          (VP (VBD heard) (NP (PRP$ his) (NN prayer)))))\n      (. .)\n      (PRN\n        (S\n          (NP (PRP He))\n          (VP (VBD came) (PRT (RP down)) (S (ADJP (JJ furious)))))))))"
+        ],
+        "paragraph": "with garlands, or burned your thigh-bones in fat of bulls or goats,\ngrant my prayer, and let your arrows avenge these my tears upon the\nDanaans.\"\n\nThus did he pray, and Apollo heard his prayer. He came down furious",
+        "score": 3
+    },
+    {
+        "parse": [
+            "(ROOT\n  (FRAG\n    (PP\n      (IN from)\n      (NP\n        (NP (DT the) (NNS summits))\n        (PP (IN of) (NP (NNP Olympus)))\n        (, ,)\n        (PP\n          (IN with)\n          (NP\n            (NP (PRP$ his) (NN bow))\n            (CC and)\n            (NP (PRP$ his) (NN quiver))))))\n    (PP (IN upon) (NP (PRP$ his)))))",
+            "(ROOT\n  (S\n    (NP (NP (NN shoulder)) (, ,) (CC and) (NP (DT the) (NNS arrows)))\n    (VP\n      (VBN rattled)\n      (PP\n        (IN on)\n        (NP\n          (NP (PRP$ his) (NN back))\n          (PP\n            (IN with)\n            (NP (NP (DT the) (NN rage)) (SBAR (WHNP (WDT that))))))))))",
+            "(ROOT\n  (S\n    (PRN\n      (S (VP (VBD trembled) (PP (IN within) (NP (PRP him))) (. .))))\n    (NP (PRP He))\n    (VP\n      (VBD sat)\n      (NP (PRP himself))\n      (PRT (RP down))\n      (ADVP\n        (RB away)\n        (PP\n          (IN from)\n          (NP (NP (DT the) (NNS ships)) (PP (IN with) (NP (DT a)))))))))",
+            "(ROOT\n  (S\n    (NP\n      (NP (NN face))\n      (PP\n        (IN as)\n        (NP\n          (ADJP\n            (JJ dark)\n            (PP\n              (IN as)\n              (NP\n                (NP (NN night))\n                (, ,)\n                (CC and)\n                (NP (PRP$ his) (NN silver)))))\n          (NN bow))))\n    (VP\n      (VBD rang)\n      (NP (NN death))\n      (SBAR\n        (IN as)\n        (S (NP (PRP he)) (VP (VBD shot) (NP (PRP$ his))))))))"
+        ],
+        "paragraph": "from the summits of Olympus, with his bow and his quiver upon his\nshoulder, and the arrows rattled on his back with the rage that\ntrembled within him. He sat himself down away from the ships with a\nface as dark as night, and his silver bow rang death as he shot his",
+        "score": 6
+    }
+]

@@ -24,6 +24,8 @@ import requests
 from alive_progress import alive_bar
 import csv
 import scipy
+import nltk
+import torch
 from nltk.parse.corenlp import CoreNLPParser
 from icgauge import experiment_frameworks
 from doctr.models import ocr_predictor
@@ -44,6 +46,9 @@ def OCRSetup(dataset):
     Return: server- subprocess running nlp server,model- OCR prediction model for pdfs
     """
 
+    torch.cuda.empty_cache()
+    nltk.download('punkt')
+
     # Define model for docTR ocr, try for NVIDIA graphics, if not found run from cpu
     try:
         model = ocr_predictor(
@@ -51,7 +56,8 @@ def OCRSetup(dataset):
             pretrained=True,
             assume_straight_pages=False,
             preserve_aspect_ratio=True,
-        ).cuda()
+        ).cuda(device=0)#specify index of gpu for cuda use
+        print("Running OCR using GPU:",torch.cuda.get_device_name(torch.cuda.current_device))
     except RuntimeError:
         model = ocr_predictor(
             dataset,
@@ -59,6 +65,7 @@ def OCRSetup(dataset):
             assume_straight_pages=False,
             preserve_aspect_ratio=True,
         )
+        print("Running OCR using CPU")
 
     # Host nlp locally
     path_to_stanford_nlp = os.environ.get("STANFORD_NLP_HOME")
@@ -69,7 +76,9 @@ def OCRSetup(dataset):
     # Command to start a local CoreNLP server
     command = [
         "java",
-        "-mx4g",
+        "-XX:+UseG1GC",
+        "-Xms16g",
+        "-Xmx32g",
         "-cp",
         os.path.join(path_to_stanford_nlp, "*"),
         "edu.stanford.nlp.pipeline.StanfordCoreNLPServer",
@@ -77,11 +86,7 @@ def OCRSetup(dataset):
         "9000",
         "-timeout",
         "600000",
-        "-be_quiet",
-        "False",
-        "-memory",
-        "6G",
-    ]  # runtime of
+    ]
     # Start the server as a subproces
     server = subprocess.Popen(
         command,
@@ -225,21 +230,27 @@ def CreatePathDict():
 
     matched_dir = os.path.join(os.getcwd(), "matched_folders")
 
-    for folder in os.listdir(matched_dir):
-        folder_path = os.path.join(matched_dir, folder)
+    dirlist=os.listdir(matched_dir)
 
-        for file in os.listdir(folder_path):
-            file_path = os.path.join(folder_path, file)
+    with alive_bar(len(dirlist)) as bar:
+        bar.text("Creating file path dict...")
+        
+        for folder in dirlist:
+            folder_path = os.path.join(matched_dir, folder)
 
-            with open("metadata.csv", "r") as csvfile:
-                reader = csv.reader(csvfile)
-                next(reader)  # skip header
+            for file in os.listdir(folder_path):
+                file_path = os.path.join(folder_path, file)
 
-                for row in reader:
+                with open("metadata.csv", "r") as csvfile:
+                    reader = csv.reader(csvfile)
+                    next(reader)  # skip header
 
-                    if row[0] == file:  # check for a file path match
-                        path_dict[file_path] = (row[1], row[2], row[4])
-                        break
+                    for row in reader:
+
+                        if row[0] == file:  # check for a file path match
+                            path_dict[file_path] = (row[1], row[2], row[4])
+                            break
+            bar()
 
     return path_dict
 
@@ -255,7 +266,7 @@ def WriteToExtractedText(formatted_text, val):
     """
 
     # TEMP TO VIEW OUTPUT
-    file_name = val[0] + "_" + val[1] + "_" + val[2]
+    file_name = val[0] + "_" + val[1].replace(" ","_") + "_" + val[2]
     if file_name + ".txt" not in os.listdir(extracted_text_dir):
         target_path = os.path.join(extracted_text_dir, file_name)
         f = open(target_path, "w")
@@ -283,20 +294,19 @@ def WriteComplexity(val, complexity):
 def main():
 
     server, model = OCRSetup("linknet_resnet18")
-
     path_dict = CreatePathDict()
-    print(path_dict)
-
     ResetIndex(True)
     starting_index, ending_index = GetIndices(len(path_dict))
 
-    curr_firm = 1
+
     with alive_bar(len(path_dict)) as bar:
         bar.text("Starting...")
         bar()
-
+        curr_firm = 1
+    
         for key, val in path_dict.items():
 
+            bar.text("OCRing and gathering complexities")
             if (curr_firm >= starting_index) and (curr_firm <= ending_index):
                 doc = DocumentFile.from_pdf(key)
                 result = model(doc)

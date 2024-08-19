@@ -8,7 +8,7 @@ For MSU College of Business - Management Department
 - `alive-progress==3.1.5`
 - `glib==1.0.0`
 - `gobject==0.1.0`
-- icgauge (my abridged version) @ https://drive.google.com/drive/folders/1ym4tD91R-KLLtsqS1h12otNivBDugHOv, download into root project folder (/ARC-COLLECTION-SCRIPT)
+- icgauge (my version with slight changes, originally from https://github.com/ptoman/icgauge, i updated it some so it can run with newest version of python), now in git
 - `httplib2==0.22.0`
 - `nltk==3.8.1`
 - `numpy==1.26.4`

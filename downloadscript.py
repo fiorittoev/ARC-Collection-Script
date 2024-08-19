@@ -743,14 +743,14 @@ def GetIndices(size):
     Return: two ints, first is starting index, second is ending_index
     """
     # Loop until input is valid
-    size = str(size)
+    size = int(size)
     while 1:
         starting_index = input(
             "Input starting firm index (1-"
-            + size
+            + str(size)
             + "), 'c' to continue from last index stored\n"
         )
-        ending_index = input("Input ending firm index (1-" + size + ")\n")
+        ending_index = input("Input ending firm index (1-" + str(size) + ")\n")
 
         if starting_index.isnumeric() and ending_index.isnumeric():
             starting_index = int(starting_index)  # strings to int
@@ -804,7 +804,7 @@ def ResetIndex(query):
     Return: void or 0
     """
     if query:
-        ans = input("Reset download progress? (Y/N)")
+        ans = input("Reset stored index? (Y/N)")
         if ans == "Y":
             f = open("lastindex.txt", "w")
             f.write(str(0))
